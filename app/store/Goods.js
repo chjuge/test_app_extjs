@@ -6,6 +6,8 @@ Ext.define('test_app.store.Goods', {
     fields: [
         'id', 'name', 'description', 'price', 'count'],
 
+    storeId: 'mainStore',
+
     data: {
         items: [
             { id: '1', name: 'Мышь Bloody j90s', description: 'Мышь компьютерная проводная A4Tech Bloody, новая', price: '1900', count: '15'},

@@ -11,39 +11,42 @@ Ext.define('test_app.view.main.MainController', {
 
     onItemSelected: function () {   //sender, record
         //        Ext.Msg.confirm('Confirm', 'Are you sure?', 'onConfirm', this);
-        alert('It works');
+        let grid = this.lookupReference('grid');
+        let item = grid.getStore().getById(22).data;
+        console.log(item);
         Ext.create('Ext.window.Window', {
             requires: ['Ext.form.Panel'],
             bodyPadding: 10,
             title: 'Карточка товара',
             closable: false,
             autoShow: true,
-            reference: 'card',
+            reference: 'cardWindow',
 
             items: {
                 xtype: 'form',
+                reference: 'cardForm',
                 items: [{
                     xtype: 'textfield',
                     fieldLabel: 'ID:',
                     name: 'id',
                     readOnly: true,
-                    value: '2'
+                    value: item.id
                 }, {
                     xtype: 'textfield',
                     fieldLabel: 'Наименование:',
                     name: 'name',
                     readOnly: true,
-                    value: 'Заглушка наименования'
+                    value: item.name
                 }, {
                     xtype: 'textfield',
                     fieldLabel: 'Цена:',
                     name: 'price',
-                    value: '5000'
+                    value: item.price
                 }, {
                     xtype: 'textfield',
                     fieldLabel: 'Кол-во:',
                     name: 'count',
-                    value: '10'
+                    value: item.count
                 }],
 
                 buttons: ['->',
@@ -84,18 +87,16 @@ Ext.define('test_app.view.main.MainController', {
                 xtype: 'textfield',
                 fieldLabel: 'ID:',
                 reference: 'searchById',
-            }, {
-                xtype: 'button',
-                text: 'Отфильтровать (заглушка)',
-                handler: 'onKeyUpEnter'
+                listeners: {
+                    change: 'onKeyUpEnter'
+                }
             }, {
                 xtype: 'textfield',
                 fieldLabel: 'Описание:',
-                reference: 'searchByName'
-            }, {
-                xtype: 'button',
-                text: 'Отфильтровать (заглушка)',
-                handler: 'onKeyUpEnter2'
+                reference: 'searchByName',
+                listeners: {
+                    change: 'onKeyUpEnter2'
+                }
             }, {
                 xtype: 'mainlist',
                 reference: 'grid'
@@ -106,30 +107,48 @@ Ext.define('test_app.view.main.MainController', {
 
     onKeyUpEnter: function () {
         let input = this.lookupReference('searchById');
-        alert(input.value);
 
         let grid = this.lookupReference('grid');
         grid.getStore().filter('id', input.value);
     },
 
     onKeyUpEnter2: function () {
+
         let input = this.lookupReference('searchByName');
-        alert(input.value);
 
         let grid = this.lookupReference('grid');
         grid.getStore().filter('name', input.value);
     },
 
     onSave: function () {
-        let form = this.lookupReference('card');
-        alert('saved!');
-        form.close();
+        let window = this.lookupReference('cardWindow');
+        let form = this.lookupReference('cardForm');
+        let values = form.getValues();
+
+        let id = values.id;
+        let price = values.price;
+        let count = values.count;
+
+        let grid = this.lookupReference('grid');
+        let store = grid.getStore();
+        let record = store.getById(id).data;
+        record.price = price;
+        record.count = count;
+
+        console.log('price ' + price);
+        console.log('count ' + count);
+        console.log('id ' + id);
+        console.log(record);
+        window.close();
+        store.filter('id', ''); //костыль перерисовки grid-a
+
+        console.log(this.lookupReference('rec'));
     },
 
     onCancel: function () {
-        let form = this.lookupReference('card');
+        let window = this.lookupReference('cardWindow');
         alert('canceled!');
-        form.close();
+        window.close();
 
     }
 });

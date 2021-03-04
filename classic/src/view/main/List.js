@@ -17,7 +17,7 @@ Ext.define('test_app.view.main.List', {
 
     columns: [
         { text: 'Id', dataIndex: 'id', filter: { type: 'int' } },
-        { text: 'Имя', dataIndex: 'name', filter: { type: 'string' }, listeners: { click: 'onItemSelected' }, flex: 1 },
+        { text: 'Имя', dataIndex: 'name', filter: { type: 'string' }, listeners: { click: 'onItemSelected', }, reference: 'rec', flex: 1 },
         { text: 'Описание', dataIndex: 'description',  flex: 2 },
         { text: 'Цена', dataIndex: 'price', flex: 1 },
         { text: 'Кол-во', dataIndex: 'count' }

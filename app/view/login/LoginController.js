@@ -16,6 +16,6 @@ Ext.define('test_app.view.login.LoginController', {
                 xtype: 'app-main'
             });
          }
-         else alert('Неверно введен логин или пароль');
+         else Ext.Msg.alert('Ошибка','Логин: admin, Пароль: padmin');
     }
 });

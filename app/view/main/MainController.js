@@ -9,11 +9,14 @@ Ext.define('test_app.view.main.MainController', {
 
     alias: 'controller.main',
 
-    onItemSelected: function () {   //sender, record
+    onItemSelected: function (e, t) {   //sender, record
         //        Ext.Msg.confirm('Confirm', 'Are you sure?', 'onConfirm', this);
         let grid = this.lookupReference('grid');
-        let item = grid.getStore().getById(22).data;
+        let id = Ext.get(t).up().dom.children[0].textContent;
+        let item = grid.getStore().findRecord('id', id).data;
+
         console.log(item);
+
         Ext.create('Ext.window.Window', {
             requires: ['Ext.form.Panel'],
             bodyPadding: 10,
@@ -87,15 +90,17 @@ Ext.define('test_app.view.main.MainController', {
                 xtype: 'textfield',
                 fieldLabel: 'ID:',
                 reference: 'searchById',
+                enableKeyEvents: true,
                 listeners: {
-                    change: 'onKeyUpEnter'
+                    keyup: 'onKeyUpEnter'
                 }
             }, {
                 xtype: 'textfield',
                 fieldLabel: 'Описание:',
-                reference: 'searchByName',
+                reference: 'searchByDescription',
+                enableKeyEvents: true,
                 listeners: {
-                    change: 'onKeyUpEnter2'
+                    keyup: 'onKeyUpEnter2'
                 }
             }, {
                 xtype: 'mainlist',
@@ -105,19 +110,42 @@ Ext.define('test_app.view.main.MainController', {
         pannel.setActiveTab(tab);
     },
 
-    onKeyUpEnter: function () {
+    onKeyUpEnter: function (thisField, e) {
         let input = this.lookupReference('searchById');
+        let id = input.value;
 
         let grid = this.lookupReference('grid');
-        grid.getStore().filter('id', input.value);
+        let store = grid.getStore();
+
+        //record = store.findRecord('id', id);
+        if (e.browserEvent.keyCode == 13) {
+            store.clearFilter();
+            store.filterBy(rec => {
+                if (rec.get('id') === id || id === '') {
+                    return true;
+                }
+                else return false;
+            })
+        }
     },
 
-    onKeyUpEnter2: function () {
-
-        let input = this.lookupReference('searchByName');
+    onKeyUpEnter2: function (thisField, e) {
+        let input = this.lookupReference('searchByDescription');
+        let substring = input.value;
 
         let grid = this.lookupReference('grid');
-        grid.getStore().filter('name', input.value);
+        let store = grid.getStore();
+
+        if (e.browserEvent.keyCode == 13) {
+            store.clearFilter();
+            store.filterBy(record => {
+                if (record.get('name').includes(substring)) {
+                    return true;
+                }
+                else return false;
+            })
+            // store.filter('name', substring);
+        }
     },
 
     onSave: function () {
@@ -132,23 +160,30 @@ Ext.define('test_app.view.main.MainController', {
         let grid = this.lookupReference('grid');
         let store = grid.getStore();
         let record = store.getById(id).data;
-        record.price = price;
-        record.count = count;
 
-        console.log('price ' + price);
-        console.log('count ' + count);
-        console.log('id ' + id);
-        console.log(record);
-        window.close();
-        store.filter('id', ''); //костыль перерисовки grid-a
 
-        console.log(this.lookupReference('rec'));
+        validatePrice = +price;
+        validateCount = +count;
+
+        if (!isNaN(validatePrice) && !isNaN(validateCount) && validateCount >= 0 && validatePrice >= 0) {
+
+            Ext.Msg.alert('', 'Данные изменены')
+            
+            
+            record.price = validatePrice;
+            record.count = validateCount;
+
+            
+            window.destroy();
+            store.filter('id', ''); //костыль перерисовки grid-a
+        }
+        else Ext.Msg.alert('Ошибка', 'Ошибка валидации ввода')
+
     },
 
     onCancel: function () {
         let window = this.lookupReference('cardWindow');
-        alert('canceled!');
-        window.close();
+        window.destroy();
 
     }
 });

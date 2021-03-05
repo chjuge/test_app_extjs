@@ -9,6 +9,8 @@ Ext.define('test_app.view.main.List', {
         'test_app.store.Goods',
     ],
 
+    columnLines: true,
+
     title: 'Список товаров',
 
     store: {
@@ -17,10 +19,18 @@ Ext.define('test_app.view.main.List', {
 
     columns: [
         { text: 'Id', dataIndex: 'id', filter: { type: 'int' } },
-        { text: 'Имя', dataIndex: 'name', filter: { type: 'string' }, listeners: { click: 'onItemSelected', }, reference: 'rec', flex: 1 },
-        { text: 'Описание', dataIndex: 'description',  flex: 2 },
+        { text: 'Имя', dataIndex: 'name', filter: { type: 'string' }, listeners: { click: 'onItemSelected', }, flex: 1 },
+        { text: 'Описание', dataIndex: 'description', flex: 2 },
         { text: 'Цена', dataIndex: 'price', flex: 1 },
-        { text: 'Кол-во', dataIndex: 'count' }
+        {
+            text: 'Кол-во', dataIndex: 'count',
+            renderer: function (value, meta) {
+                if (parseInt(value) === 0 || value==='') {
+                    meta.style = "background-color:red;";
+                } 
+                return value;
+            }
+        }
     ],
 
 
